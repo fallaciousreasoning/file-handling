@@ -60,14 +60,77 @@
 </head>
 
 <body>
-  <section id="introduction">
-    <h2>Introduction</h2>
+  <section id="abstract">
+    <h2>Abstract</h2>
     <p>
-      This is a proposed capability for web applications to support File Handling.
+      This specification defines an API that allows websites to declare themselves as a file handler
     </p>
     <p>
-      Please see the <a href="https://github.com/ewilligers/file-handling/blob/master/explainer.md">Explainer
+      Please see the <a href="https://github.com/WICG/file-handling/blob/master/explainer.md">Explainer
         document</a>, a high-level overview of the proposal.
+    </p>
+  </section>
+  <section id="sotd">
+    <p>
+      This is an early draft of the File Handing spec.
+    </p>
+  </section>
+  <section>
+    <h2>Prerequisites</h2>
+    <p>
+
+    </p>
+  </section>
+  <section class="informative">
+    <h2>Usage Example</h2>
+    <p>
+      To register a site as a file handler, a <a>file_handler</a> entry is
+      added to the <a data-cite="appmanifest">Web App Manifest</a>, as shown:
+    </p>
+    <pre class="example json" title="manifest.json">
+      {
+        "name": "Grafr",
+        "file_handler": {
+          "open_url": "/where-the-files-go",
+          "files": [
+            {
+              "name": "raw",
+              "accept": [".csv", "text/csv"]
+            },
+            {
+              "name": "graph",
+              accept: [".svg", "image/svg+xml"]
+            }
+          ]
+        }
+      }
+    </pre>
+    <p>
+      When a launch event is triggered the application can use <code>name</code> to determine the type of file that was opened.
+    </p>
+    <pre class="example js" title="service-worker.js">
+      self.addEventListener('launch', event => {
+        event.waitUntil(async () => {
+          // Try and find an existing application window.
+          const allClients = await clients.matchAll();
+          let client = allClients[0];
+          <br/>
+          // If no client is available, make a new one.
+          if (!client)
+            client = clients.openWindow(event.openUrl);
+          <br/>
+          // Pass the files to the client.
+          client.postMessage(event.files);
+          // And make it the active window.
+          client.focus();
+        });
+      });
+    </pre>
+  </section>
+  <section data-link-for="WebAppManifest">
+    <h2>Extension to the Web App Manifest</h2>
+    <p>
+      The following IDL extends the <dfn data-cite="!appmanifest#dom-webappmanifest">WebAppManifest</dfn> dictionary.
     </p>
   </section>
 </body>
